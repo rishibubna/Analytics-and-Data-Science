@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        
+	<script  type="text/javascript" src="lib/d3/d3.min.js"></script>
+	<script  type="text/javascript" src="lib/d3/d3-dsv.min.js"></script>
+	<script  type="text/javascript" src="lib/d3/d3-fetch.min.js"></script>
+	<title>Lego Sets by Year from Rebrickable</title>
+	</head>
+	
+    <body>	
+		<div id = "visualization"></div>
+		<svg width="600" height="500"></svg>
+
+        <script type="text/javascript">
+		
+		var margin = {top:50,right:50,bottom:100,left:50};
+		
+		var width = 1020 - margin.left - margin.right;
+		var height = 500 - margin.top - margin.bottom;
+		
+		var svg = d3.select("svg")
+			.attr("width",width + margin.left + margin.right)
+			.attr("height",height + margin.top + margin.bottom)
+			.append("g")
+			.attr("transform",
+				  "translate("+ margin.left+ "," + margin.top + ")");
+				  
+				  
+		
+			
+
+		
+		
+		d3.dsv(",","q3.csv").then(function(data){
+			data.forEach(function(d) {
+			d.running_total = +d.running_total;
+			})
+			
+			x = d3.scaleTime()
+			.range([0,width])
+			//.ticks(d3.timeYear.every(3))
+			.domain([d3.min(data,function(d){return d.year;}), d3.max(data,function(d){return d.year;})]);
+			//.domain(d3.extent(data, function(d) { return d.date; }));
+
+
+
+			
+
+			
+			
+			y = d3.scaleLinear()
+			.range([height, 0])
+			.domain([0,d3.max(data, function(d) {return d.running_total})]);;
+		
+		
+		
+
+		
+		
+		console.log(data)
+		svg.selectAll(".bar")
+			.data(data)
+			.enter().append("rect")
+			.attr("class","bar")
+			.attr("x", function(d) {return x(d.year);})
+			.attr("width", 0.75*width/data.length)
+			.attr("y", function(d) {return y(d.running_total);})
+			.attr("height",function(d) {return height - y(d.running_total);});
+		
+		svg.append("g")
+			.attr("transform","translate(0," + height + ")")
+			.call(d3.axisBottom(x)
+			.tickFormat(d3.format("d"))
+			.ticks(data.length/3));
+		
+		svg.append("g")
+			.call(d3.axisLeft(y));
+
+		svg.append("text")
+			.attr("transform",
+				  "translate(300,-10)")
+			.text("Lego Sets by Year from Rebrickable");
+		svg.append("text")
+			.attr("transform",
+				  "translate(800,400)")
+			.text("rbubna3");
+});
+		
+		
+            // Your beautiful D3 code will go here
+        </script>
+    </body>
+</html>
